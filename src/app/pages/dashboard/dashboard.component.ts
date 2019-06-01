@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import Chart from 'chart.js';
-import { AuthService } from '../../services/auth/auth.service';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { User } from '../../models/user.model';
+import { Trans } from '../../models/trans.model';
+import { AuthService } from '../../services/auth/auth.service';
+import { TransService } from '../../services/trans/trans.service';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { Observable } from 'rxjs';
+import { map } from "rxjs/operators";
 
 // core components
 import {
@@ -24,18 +30,53 @@ export class DashboardComponent implements OnInit {
   public clicked: boolean = true;
   public clicked1: boolean = false;
   closeResult: string;
+  
+  trans: Trans = {
+    date: 0,
+    type: '',
+    amount: 0,
+    category: 'None',
+    uid: '',
+  }
+
+  transDB: Trans[];
+
+  userTemp: User = {
+    uid: '',
+    email: '',
+    photoURL: '',
+    displayName: '',
+    income: 0,
+    expenses: 0
+  }
 
   constructor(public auth: AuthService, 
-    private modalService: NgbModal) { }
+    private transService: TransService,
+    private modalService: NgbModal,
+    private afAuth: AngularFireAuth) {
+      this.afAuth.auth.onAuthStateChanged(user => {
+        if (user) {
+          this.userTemp.uid = user.uid;
+          this.userTemp.email = user.email;
+          this.userTemp.photoURL = user.photoURL;
+          this.userTemp.displayName = user.displayName;
+          this.trans.uid = user.uid;
+        }
+      })
+    }
 
   ngOnInit() {
+
+    this.transService.getTrans().pipe(map(transDBTemp => transDBTemp.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())))
+      .subscribe(transDBTemp => {
+      this.transDB = transDBTemp;
+    })
 
     this.datasets = [
       [0, 20, 10, 30, 15, 40, 20, 60, 60],
       [0, 20, 5, 25, 10, 30, 15, 40, 40]
     ];
     this.data = this.datasets[0];
-
 
     var chartOrders = document.getElementById('chart-orders');
 
@@ -79,5 +120,28 @@ export class DashboardComponent implements OnInit {
       return  `with: ${reason}`;
     }
   }
+  
+  addIncome() {
+    if (this.trans.amount > 0) {
+      this.userTemp.income += this.trans.amount;
+      this.auth.updateUserData(this.userTemp);
+      this.trans.date = Date.now();
+      this.trans.type = 'Income';
+      this.transService.addTrans(this.trans);
+      this.trans.category = 'None';
+      this.trans.amount = 0;
+    }
+  }
 
+  addExpense() {
+    if (this.trans.amount > 0) {
+      this.userTemp.expenses += this.trans.amount;
+      this.auth.updateUserData(this.userTemp);
+      this.trans.date = Date.now();
+      this.trans.type = 'Expense';
+      this.transService.addTrans(this.trans);
+      this.trans.category = 'None';
+      this.trans.amount = 0;
+    }
+  }
 }

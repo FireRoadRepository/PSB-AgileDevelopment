@@ -1,7 +1,8 @@
 export interface Trans {
-    tid: string;
-    date: string;
+    tid?: string;
+    date: number;
+    type: string;
     amount: number;
-    cid: string;
+    category: string;
     uid: string;
 }

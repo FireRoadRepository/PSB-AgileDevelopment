@@ -31,32 +31,45 @@ export class AuthService {
             }
           })
         )
+ 
     }
 
     async googleSignin() {
       const provider = new auth.GoogleAuthProvider();
       const credential = await this.afAuth.auth.signInWithPopup(provider);
       this.router.navigate(['dashboard']);
-      return this.updateUserData(credential.user);
+      return this.updateUserDataInit(credential.user);
     }
   
-    private updateUserData(user) {
+    public updateUserDataInit(user) {
       const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.uid}`);
+
+      let data: User = {
+        uid: user.uid, 
+        email: user.email, 
+        displayName: user.displayName, 
+        photoURL: user.photoURL
+      };
+        
+      return userRef.set(data, { merge: true });
+    }
   
-      const data = { 
+    public updateUserData(user) {
+      const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.uid}`);
+
+      console.log(user.income + " " + user.expenses);
+      let data: User = {
         uid: user.uid, 
         email: user.email, 
         displayName: user.displayName, 
         photoURL: user.photoURL,
         income: user.income,
-        expenses: user.expenses,
-        balance: user.balance
-      } 
-  
-      return userRef.set(data, { merge: true })
-  
+        expenses: user.expenses
+      };
+      
+      return userRef.set(data, { merge: true });
     }
-  
+
     async signOut() {
       await this.afAuth.auth.signOut();
       this.router.navigate(['login']);

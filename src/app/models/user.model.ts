@@ -1,9 +1,8 @@
 export interface User {
     uid: string;
-    email: string;
+    email?: string;
     photoURL?: string;
     displayName?: string;
-    income: number;
-    expenses: number;
-    balance: number;
+    income?: number;
+    expenses?: number;
 }

@@ -20,7 +20,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
-import { NgbdModalBasic } from'./modal/modal-basic';
 
 const config = {
                   apiKey: "AIzaSyAaNZ5QCgjmjFlQm4YkrSPpqz2391aPBBk",
