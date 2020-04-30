@@ -30,7 +30,7 @@
     "core-js": "2.6.4",
     "firebase": "^5.11.1",
     "git": "^0.1.5",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "ngx-clipboard": "11.1.9",
     "ngx-toastr": "9.1.2",
     "node-sass": "^4.12.0",
